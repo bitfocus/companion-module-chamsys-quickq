@@ -9,6 +9,7 @@ export function getActions() {
 					label: 'Playback',
 					default: 1,
 					min: 1,
+					max: 10,
 				},
 				{
 					id: 'level',
@@ -33,6 +34,7 @@ export function getActions() {
 					label: 'Playback',
 					default: 1,
 					min: 1,
+					max: 10,
 				},
 			],
 			callback: (action) => {
@@ -49,6 +51,7 @@ export function getActions() {
 					label: 'Playback',
 					default: 1,
 					min: 1,
+					max: 10,
 				},
 			],
 			callback: (action) => {
@@ -64,6 +67,7 @@ export function getActions() {
 					label: 'Playback',
 					default: 1,
 					min: 1,
+					max: 10,
 				},
 			],
 			callback: (action) => {
@@ -79,6 +83,7 @@ export function getActions() {
 					label: 'Playback',
 					default: 1,
 					min: 1,
+					max: 10,
 				},
 			],
 			callback: (action) => {
@@ -94,6 +99,7 @@ export function getActions() {
 					label: 'Item',
 					default: 1,
 					min: 1,
+					max: 10,
 				},
 				{
 					id: 'zone',

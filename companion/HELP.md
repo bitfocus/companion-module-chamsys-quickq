@@ -5,6 +5,7 @@ Control Chamsys [QuickQ lighting consoles](https://chamsyslighting.com/collectio
 **Requirements**
 
 - Requires QuickQ Software Version 6.0 or later
+- On your Companion computer, port `9000` must be available to receive feedback from the console
 
 **Basic Configuration**
 
@@ -19,3 +20,11 @@ Control Chamsys [QuickQ lighting consoles](https://chamsyslighting.com/collectio
 - Pause playback
 - Release playback
 - Control 10Scene button (Activate/Deactivate)
+
+**Available Feedback**
+
+- Playback fader level
+
+**Available Variables**
+
+- playback\_#_level

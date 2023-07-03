@@ -14,6 +14,7 @@ class QuickQInstance extends InstanceBase {
 
 	async init(config) {
 		this.config = config
+		this.playbacks = {}
 
 		this.updateStatus(InstanceStatus.Connecting)
 
@@ -105,7 +106,6 @@ class QuickQInstance extends InstanceBase {
 
 		this.listener.open()
 		this.listener.on('ready', () => {
-			console.log('open')
 			this.updateStatus(InstanceStatus.Ok)
 			this.sendCommand('/feedback/pb+exec')
 		})
@@ -118,6 +118,18 @@ class QuickQInstance extends InstanceBase {
 
 		this.listener.on('message', (message) => {
 			let value = message?.args[0]?.value
+
+			if (message?.address.match(/\/pb\/[0-9]+$/)) {
+				let playbackInfo = message.address.match(/(\/pb\/)([0-9]+)$/)
+
+				if (playbackInfo?.[2]) {
+					let num = playbackInfo[2]
+					let percent = Math.round(value * 100)
+					this.playbacks[`${num}`] = { fader: percent }
+					this.setVariableValues({ [`playback_${num}_fader`]: percent })
+					this.checkFeedbacks()
+				}
+			}
 		})
 	}
 }
