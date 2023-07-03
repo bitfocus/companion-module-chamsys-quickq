@@ -3,8 +3,8 @@ export function getVariables() {
 
 	for (let i = 1; i < 11; i++) {
 		variables.push({
-			name: `Playback ${i} - Fader`,
-			variableId: `playback_${i}_fader`,
+			name: `Playback ${i} - Level`,
+			variableId: `playback_${i}_level`,
 		})
 	}
 

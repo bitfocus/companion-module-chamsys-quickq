@@ -9,9 +9,9 @@ export function getFeedbacks() {
 	const ColorGreen = combineRgb(0, 200, 0)
 	const ColorOrange = combineRgb(255, 102, 0)
 
-	feedbacks['playbackFader'] = {
+	feedbacks['playbackLevel'] = {
 		type: 'boolean',
-		name: 'Playback fader level',
+		name: 'Playback level',
 		description: 'Change style if the playback fader level is at or above the selected level',
 		defaultStyle: {
 			color: ColorWhite,

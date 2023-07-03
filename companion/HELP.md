@@ -23,7 +23,7 @@ Control Chamsys [QuickQ lighting consoles](https://chamsyslighting.com/collectio
 
 **Available Feedback**
 
-- Playback fader level
+- Playback level
 
 **Available Variables**
 
