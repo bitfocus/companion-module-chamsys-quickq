@@ -123,6 +123,15 @@ export function getActions() {
 				this.sendCommand(`/10scene/${action.options.item}${zone}`, action.options.activate ? 1 : 0)
 			},
 		},
+		restOSC: {
+			name: 'Reset OSC',
+			options: [
+
+			],
+			callback: (action) => {
+				this.initOSC()
+			},
+		},
 	}
 	return actions
 }

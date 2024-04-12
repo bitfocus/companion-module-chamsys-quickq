@@ -91,6 +91,7 @@ class QuickQInstance extends InstanceBase {
 	}
 
 	initOSC() {
+		console.log("Setting up UPD Socket")
 		this.states = {}
 
 		if (this.listener) {
