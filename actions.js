@@ -120,7 +120,7 @@ export function getActions() {
 				if (action.options.zone > 0) {
 					zone = `/${action.options.zone}`
 				}
-				this.sendCommand(`/10scene/${action.options.item}${zone}`, action.options.zone ? 1 : 0)
+				this.sendCommand(`/10scene/${action.options.item}${zone}`, action.options.activate ? 1 : 0)
 			},
 		},
 	}
