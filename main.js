@@ -127,7 +127,7 @@ class QuickQInstance extends InstanceBase {
 					let num = playbackInfo[2]
 					let percent = Math.round(value * 100)
 					this.playbacks[`${num}`] = { fader: percent }
-					this.setVariableValues({ [`playback_${num}_fader`]: percent })
+					this.setVariableValues({ [`playback_${num}_level`]: percent })
 					this.checkFeedbacks()
 				}
 			}
