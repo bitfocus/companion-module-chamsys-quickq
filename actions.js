@@ -125,9 +125,7 @@ export function getActions() {
 		},
 		restOSC: {
 			name: 'Reset OSC',
-			options: [
-
-			],
+			options: [],
 			callback: (action) => {
 				this.initOSC()
 			},
