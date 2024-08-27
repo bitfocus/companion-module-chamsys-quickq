@@ -1,6 +1,6 @@
 {
 	"name": "chamsys-quickq",
-	"version": "1.0.1",
+	"version": "1.0.2",
 	"main": "main.js",
 	"type": "module",
 	"scripts": {
@@ -12,8 +12,8 @@
 		"url": "git+https://github.com/bitfocus/companion-module-chamsys-quickq.git"
 	},
 	"dependencies": {
-		"@companion-module/base": "~1.7.0",
-		"osc": "^2.4.4"
+		"@companion-module/base": "~1.10.0",
+		"osc": "^2.4.5"
 	},
 	"devDependencies": {
 		"@companion-module/tools": "^1.5.0"
