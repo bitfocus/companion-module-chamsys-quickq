@@ -54,6 +54,15 @@ class QuickQInstance extends InstanceBase {
 				width: 8,
 				regex: Regex.IP,
 			},
+			{
+				type: 'number',
+				label: 'OSC Timeout',
+				id: 'timeout_secs',
+				min: 1,
+				max: 3600,
+				default: 10,
+				required: true
+			},
 		]
 	}
 
@@ -90,6 +99,11 @@ class QuickQInstance extends InstanceBase {
 		}
 	}
 
+	timeout_func() {
+		console.log("OSC Timeouted, after:", this.config.timeout_secs, "seconds.");
+		this.initOSC();
+	}
+
 	initOSC() {
 		//console.log('Setting up UPD Socket')
 		this.states = {}
@@ -117,7 +131,10 @@ class QuickQInstance extends InstanceBase {
 			}
 		})
 
+		this.timeout_id = setTimeout(() => {this.timeout_func()}, this.config.timeout_secs * 1000)
+
 		this.listener.on('message', (message) => {
+			console.log("MESSAGE:", message)
 			let value = message?.args[0]?.value
 
 			if (message?.address.match(/\/pb\/[0-9]+$/)) {
@@ -131,6 +148,12 @@ class QuickQInstance extends InstanceBase {
 					this.checkFeedbacks()
 				}
 			}
+
+			if (this.timeout_id) {
+				clearTimeout(this.timeout_id)
+			}
+
+			this.timeout_id = setTimeout(() => {this.timeout_func()}, this.config.timeout_secs * 1000);
 		})
 	}
 }
