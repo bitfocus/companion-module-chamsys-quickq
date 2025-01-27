@@ -60,8 +60,6 @@ export function getFeedbacks() {
 			},
 		],
 		callback: (feedback) => {
-			//return true
-			//this.log(`Returning feedback for execute ${feedback.options.execute} as ${this.playbacks[`${feedback.options.execute}`]?.state > 0}`)
 			return this.executes[`${feedback.options.execute}`]?.state > 0
 		},
 	}
