@@ -15,6 +15,7 @@ class QuickQInstance extends InstanceBase {
 	async init(config) {
 		this.config = config
 		this.playbacks = {}
+		this.executes = {}
 
 		this.updateStatus(InstanceStatus.Connecting)
 
@@ -114,6 +115,7 @@ class QuickQInstance extends InstanceBase {
 			if (err.code == 'EADDRINUSE') {
 				this.log('error', `Error: Selected feedback port ${err.message.split(':')[1]} is already in use.`)
 				this.updateStatus('bad_config', 'Feedback port conflict')
+				
 			}
 		})
 
@@ -131,6 +133,17 @@ class QuickQInstance extends InstanceBase {
 					this.checkFeedbacks()
 				}
 			}
+			else if (message?.address.match(/\/exec\/[0-9]+\/[0-9]+$/)) {
+				let executeInfo = message.address.match(/(\/exec\/)[0-9]+\/([0-9])+$/)
+
+				if (executeInfo?.[2]) {
+					let num = executeInfo[2]
+					this.executes[`${num}`] = { state: value }
+					this.setVariableValues({ [`execute_${num}_state`]: value })
+					this.checkFeedbacks()
+				}
+			}
+
 		})
 	}
 }
