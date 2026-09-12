@@ -41,5 +41,28 @@ export function getFeedbacks() {
 		},
 	}
 
+	feedbacks['executeState'] = {
+		type: 'boolean',
+		name: 'Execute state',
+		description: 'Change style if the selected execute (1-10) is active',
+		defaultStyle: {
+			color: ColorWhite,
+			bgcolor: ColorGreen,
+		},
+		options: [
+			{
+				id: 'execute',
+				type: 'number',
+				label: 'Execute',
+				default: 1,
+				min: 1,
+				max: 10,
+			},
+		],
+		callback: (feedback) => {
+			return this.executes[`${feedback.options.execute}`]?.state > 0
+		},
+	}
+
 	return feedbacks
 }
