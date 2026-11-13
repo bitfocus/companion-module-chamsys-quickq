@@ -44,12 +44,21 @@ export function getFeedbacks() {
 	feedbacks['executeState'] = {
 		type: 'boolean',
 		name: 'Execute state',
-		description: 'Change style if the selected execute (1-10) is active',
+		description:
+			'Change style if the execute at /exec/<row>/<execute> is active. Execute 5 on the first row is /exec/1/5.',
 		defaultStyle: {
 			color: ColorWhite,
 			bgcolor: ColorGreen,
 		},
 		options: [
+			{
+				id: 'row',
+				type: 'number',
+				label: 'Row',
+				default: 1,
+				min: 1,
+				max: 10,
+			},
 			{
 				id: 'execute',
 				type: 'number',
@@ -60,7 +69,8 @@ export function getFeedbacks() {
 			},
 		],
 		callback: (feedback) => {
-			return this.executes[`${feedback.options.execute}`]?.state > 0
+			const row = feedback.options.row || 1
+			return this.executes[`${row}_${feedback.options.execute}`]?.state > 0
 		},
 	}
 

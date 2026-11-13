@@ -8,5 +8,14 @@ export function getVariables() {
 		})
 	}
 
+	for (let row = 1; row < 11; row++) {
+		for (let execute = 1; execute < 11; execute++) {
+			variables.push({
+				name: `Execute ${row}/${execute} - State`,
+				variableId: `execute_${row}_${execute}_state`,
+			})
+		}
+	}
+
 	return variables
 }

@@ -94,6 +94,41 @@ export function getPresets() {
 				},
 			],
 		}
+		presets[`flash_playback_${i}`] = {
+			type: 'button',
+			category: 'Flash Playback',
+			name: `Playback ${i} - Flash`,
+			options: {},
+			style: {
+				text: `Playback\\n${i}\\nFlash`,
+				size: 14,
+				color: ColorWhite,
+				bgcolor: ColorBlack,
+			},
+			steps: [
+				{
+					down: [
+						{
+							actionId: 'playbackFlash',
+							options: {
+								playback: i,
+								level: '100',
+							},
+						},
+					],
+					up: [
+						{
+							actionId: 'playbackFlash',
+							options: {
+								playback: i,
+								level: '0',
+							},
+						},
+					],
+				},
+			],
+			feedbacks: [],
+		}
 	}
 
 	return presets

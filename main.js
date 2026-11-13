@@ -6,6 +6,7 @@ import { getFeedbacks } from './feedbacks.js'
 import UpgradeScripts from './upgrades.js'
 
 import OSC from 'osc'
+import { oscLevelToPercent, parseExecuteAddress, parsePlaybackAddress } from './osc.js'
 
 // QuickQ only sends playback/execute state after it receives /feedback/pb+exec.
 // If Companion starts first, that packet is lost, so keep resending until feedback arrives.
@@ -161,25 +162,21 @@ class QuickQInstance extends InstanceBase {
 				this.updateStatus(InstanceStatus.Ok)
 			}
 
-			let value = message?.args[0]?.value
-
-			if (message?.address.match(/\/pb\/[0-9]+$/)) {
-				let playbackInfo = message.address.match(/(\/pb\/)([0-9]+)$/)
-
-				if (playbackInfo?.[2]) {
-					let num = playbackInfo[2]
-					let percent = Math.round(value * 100)
-					this.playbacks[`${num}`] = { fader: percent }
-					this.setVariableValues({ [`playback_${num}_level`]: percent })
+			const playback = parsePlaybackAddress(message?.address)
+			if (playback) {
+				const percent = oscLevelToPercent(message?.args?.[0])
+				if (percent !== undefined) {
+					this.playbacks[`${playback}`] = { fader: percent }
+					this.setVariableValues({ [`playback_${playback}_level`]: percent })
 					this.checkFeedbacks()
 				}
-			} else if (message?.address.match(/\/exec\/[0-9]+\/[0-9]+$/)) {
-				let executeInfo = message.address.match(/(\/exec\/)[0-9]+\/([0-9])+$/)
-
-				if (executeInfo?.[2]) {
-					let num = executeInfo[2]
-					this.executes[`${num}`] = { state: value }
-					this.setVariableValues({ [`execute_${num}_state`]: value })
+			} else {
+				const execute = parseExecuteAddress(message?.address)
+				const value = message?.args?.[0]?.value
+				if (execute && typeof value === 'number') {
+					const key = `${execute.row}_${execute.execute}`
+					this.executes[key] = { state: value }
+					this.setVariableValues({ [`execute_${key}_state`]: value })
 					this.checkFeedbacks()
 				}
 			}
