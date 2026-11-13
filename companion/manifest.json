@@ -20,7 +20,7 @@
 		"entrypoint": "../main.js"
 	},
 	"legacyIds": [],
-	"manufacturer": "Chamsys",
+	"manufacturer": "ChamSys",
 	"products": ["QuickQ"],
 	"keywords": ["Lighting"]
 }
