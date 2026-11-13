@@ -120,7 +120,46 @@ export function getActions() {
 				if (action.options.zone > 0) {
 					zone = `/${action.options.zone}`
 				}
-				this.sendCommand(`/10scene/${action.options.item}${zone}`, action.options.zone ? 1 : 0)
+				this.sendCommand(`/10scene/${action.options.item}${zone}`, action.options.activate ? 1 : 0)
+			},
+		},
+		feedbackStart: {
+			name: 'Start feedback',
+			options: [
+				{
+					id: 'feedback_pb',
+					type: 'checkbox',
+					label: 'Playbacks',
+					default: true
+				},
+				{
+					id: 'feedback_exec',
+					type: 'checkbox',
+					label: 'Executes',
+					default: true
+				}
+			],
+			callback: (action) => {
+				let command = ''
+
+				if(action.options.feedback_pb) command += "pb"
+				if(action.options.feedback_pb && action.options.feedback_exec) command += "+"
+				if(action.options.feedback_exec) command += "exec"
+				this.sendCommand(`/feedback/${command}`)
+			},
+		},
+		feedbackStop: {
+			name: 'Stop feedback',
+			options: [],
+			callback: (action) => {
+				this.sendCommand(`/feedback/off`)
+			},
+		},
+		restOSC: {
+			name: 'Reset OSC',
+			options: [],
+			callback: (action) => {
+				this.initOSC()
 			},
 		},
 	}

@@ -3,7 +3,7 @@
 	"name": "chamsys-quickq",
 	"shortname": "quickq",
 	"description": "Control Chamsys QuickQ lighting consoles",
-	"version": "1.0.0",
+	"version": "1.0.2",
 	"license": "MIT",
 	"repository": "git+https://github.com/bitfocus/companion-module-chamsys-quickq.git",
 	"bugs": "https://github.com/bitfocus/companion-module-chamsys-quickq/issues",
@@ -20,7 +20,7 @@
 		"entrypoint": "../main.js"
 	},
 	"legacyIds": [],
-	"manufacturer": "Chamsys",
+	"manufacturer": "ChamSys",
 	"products": ["QuickQ"],
 	"keywords": ["Lighting"]
 }

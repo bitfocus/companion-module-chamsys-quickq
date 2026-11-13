@@ -7,6 +7,10 @@ import UpgradeScripts from './upgrades.js'
 
 import OSC from 'osc'
 
+// QuickQ only sends playback/execute state after it receives /feedback/pb+exec.
+// If Companion starts first, that packet is lost, so keep resending until feedback arrives.
+const OSC_RETRY_MS = 10 * 1000
+
 class QuickQInstance extends InstanceBase {
 	constructor(internal) {
 		super(internal)
@@ -15,6 +19,7 @@ class QuickQInstance extends InstanceBase {
 	async init(config) {
 		this.config = config
 		this.playbacks = {}
+		this.executes = {}
 
 		this.updateStatus(InstanceStatus.Connecting)
 
@@ -24,7 +29,6 @@ class QuickQInstance extends InstanceBase {
 		this.initFeedbacks()
 
 		if (this.config.host) {
-			this.updateStatus(InstanceStatus.Ok)
 			this.initOSC()
 		} else {
 			this.updateStatus('bad_config', 'Missing IP Address')
@@ -32,6 +36,8 @@ class QuickQInstance extends InstanceBase {
 	}
 
 	async destroy() {
+		this.clearOscRetry()
+
 		if (this.listener) {
 			this.listener.close()
 		}
@@ -42,7 +48,12 @@ class QuickQInstance extends InstanceBase {
 	async configUpdated(config) {
 		this.config = config
 
-		this.initOSC()
+		if (this.config.host) {
+			this.initOSC()
+		} else {
+			this.clearOscRetry()
+			this.updateStatus('bad_config', 'Missing IP Address')
+		}
 	}
 
 	getConfigFields() {
@@ -53,15 +64,6 @@ class QuickQInstance extends InstanceBase {
 				label: 'Device IP',
 				width: 8,
 				regex: Regex.IP,
-			},
-			{
-				type: 'number',
-				label: 'OSC Timeout',
-				id: 'timeout_secs',
-				min: 1,
-				max: 3600,
-				default: 10,
-				required: true
 			},
 		]
 	}
@@ -99,13 +101,33 @@ class QuickQInstance extends InstanceBase {
 		}
 	}
 
-	timeout_func() {
-		console.log("OSC Timeouted, after:", this.config.timeout_secs, "seconds.");
-		this.initOSC();
+	clearOscRetry() {
+		if (this.oscRetryTimer) {
+			clearTimeout(this.oscRetryTimer)
+			delete this.oscRetryTimer
+		}
+	}
+
+	scheduleOscRetry() {
+		this.clearOscRetry()
+
+		this.oscRetryTimer = setTimeout(() => {
+			delete this.oscRetryTimer
+
+			if (this.oscFeedbackReceived || !this.config?.host) return
+
+			this.log('debug', 'No OSC feedback received, retrying connection')
+			this.sendCommand('/feedback/pb+exec')
+			this.scheduleOscRetry()
+		}, OSC_RETRY_MS)
 	}
 
 	initOSC() {
+		//console.log('Setting up UPD Socket')
+		this.clearOscRetry()
+		this.oscFeedbackReceived = false
 		this.states = {}
+		this.updateStatus(InstanceStatus.Connecting)
 
 		if (this.listener) {
 			this.listener.close()
@@ -118,22 +140,27 @@ class QuickQInstance extends InstanceBase {
 			metadata: true,
 		})
 
-		this.listener.open()
 		this.listener.on('ready', () => {
-			this.updateStatus(InstanceStatus.Ok)
 			this.sendCommand('/feedback/pb+exec')
+
+			if (!this.oscFeedbackReceived) {
+				this.scheduleOscRetry()
+			}
 		})
 		this.listener.on('error', (err) => {
 			if (err.code == 'EADDRINUSE') {
+				this.clearOscRetry()
 				this.log('error', `Error: Selected feedback port ${err.message.split(':')[1]} is already in use.`)
 				this.updateStatus('bad_config', 'Feedback port conflict')
 			}
 		})
-
-		this.timeout_id = setTimeout(() => {this.timeout_func()}, this.config.timeout_secs * 1000)
-
 		this.listener.on('message', (message) => {
-			console.log("MESSAGE:", message)
+			if (!this.oscFeedbackReceived) {
+				this.oscFeedbackReceived = true
+				this.clearOscRetry()
+				this.updateStatus(InstanceStatus.Ok)
+			}
+
 			let value = message?.args[0]?.value
 
 			if (message?.address.match(/\/pb\/[0-9]+$/)) {
@@ -143,17 +170,22 @@ class QuickQInstance extends InstanceBase {
 					let num = playbackInfo[2]
 					let percent = Math.round(value * 100)
 					this.playbacks[`${num}`] = { fader: percent }
-					this.setVariableValues({ [`playback_${num}_fader`]: percent })
+					this.setVariableValues({ [`playback_${num}_level`]: percent })
+					this.checkFeedbacks()
+				}
+			} else if (message?.address.match(/\/exec\/[0-9]+\/[0-9]+$/)) {
+				let executeInfo = message.address.match(/(\/exec\/)[0-9]+\/([0-9])+$/)
+
+				if (executeInfo?.[2]) {
+					let num = executeInfo[2]
+					this.executes[`${num}`] = { state: value }
+					this.setVariableValues({ [`execute_${num}_state`]: value })
 					this.checkFeedbacks()
 				}
 			}
-
-			if (this.timeout_id) {
-				clearTimeout(this.timeout_id)
-			}
-
-			this.timeout_id = setTimeout(() => {this.timeout_func()}, this.config.timeout_secs * 1000);
 		})
+
+		this.listener.open()
 	}
 }
 
